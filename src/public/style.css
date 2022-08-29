@@ -1,0 +1,226 @@
+@font-face{
+    font-family: 'SevenSegment';
+    src: url('Seven Segment.ttf');
+}
+
+*, *::after, *::before{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family:  "Lato", sans-serif;
+    background-color: black;
+    background: white;
+    overflow: hidden;
+}
+
+div#app{
+    background: black;
+    width: auto;
+    height: 100vh;
+    display: flex;
+}
+
+div.left{
+    min-width: 66vw;
+    height: 100vh;
+    color: blanchedalmond; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.nowplaying{
+    position: absolute;
+    bottom: 20%;
+    align-content: center;
+    text-align: center;
+    font-size: 30px;
+    color: whitesmoke;
+}
+div.container{
+    min-width: 34vw;
+    height: 100vh;
+    font-family: Roboto;
+    font-style: normal;
+    font-size: 48px;
+    font-weight: bold;
+}
+div.right{
+    width: auto;
+    height: 33.4vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+div.inactiveMicrophone{
+    background: radial-gradient(98.2% 98.2% at 50% 50%, #606060 0%, #000000 100%);
+}
+div.activeMicrophone{
+    background: radial-gradient(98.2% 98.2% at 50% 50%, #FF0000 0%, #000000 100%);
+}
+
+div.inactiveAutomation{
+    background: radial-gradient(98.2% 98.2% at 50% 50%, #01C701 0%, #000000 100%);
+}
+div.activeAutomation{
+    background: radial-gradient(98.2% 98.2% at 50% 50%, #FF0000 0%, #000000 100%);
+}
+div.inactiveEOF{
+    background: radial-gradient(98.2% 98.2% at 50% 50%, #00327c 0%, #000000 100%);
+}
+div.activeEOF{
+    background: radial-gradient(98.2% 98.2% at 50% 50%, #0066ff 0%, #000000 100%);
+}
+
+.clock{
+    width: 800px;
+    height: 800px;
+    border-radius: 50%;
+    position: relative;
+}
+
+.clock .number{
+    --rotation: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transform: rotate(var(--rotation));
+    color: black;
+}
+
+.clock .number1{ --rotation: 30deg}
+.clock .number2{ --rotation: 60deg}
+.clock .number3{ --rotation: 90deg}
+.clock .number4{ --rotation: 120deg}
+.clock .number5{ --rotation: 150deg}
+.clock .number6{ --rotation: 180deg}
+.clock .number7{ --rotation: 210deg}
+.clock .number8{ --rotation: 240deg}
+.clock .number9{ --rotation: 270deg}
+.clock .number10{ --rotation: 300deg}
+.clock .number11{ --rotation: 330deg}
+.clock .number12{ --rotation: 0deg}
+
+.clock .number::after{
+    content: '';
+    position: absolute;
+    background-color: red;
+    z-index: 11;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+}
+
+.inner{
+    width: 750px;
+    height: 750px;
+    border-radius: 50%;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.inner .second{
+    --second-rotation: 0deg;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transform: rotate(var(--second-rotation));
+    display: none; 
+}
+
+.inner .second1{ --second-rotation: 6deg;}
+.inner .second2{ --second-rotation: 12deg;}
+.inner .second3{ --second-rotation: 18deg;}
+.inner .second4{ --second-rotation: 24deg;}
+.inner .second5{ --second-rotation: 30deg;}
+.inner .second6{ --second-rotation: 36deg;}
+.inner .second7{ --second-rotation: 42deg;}
+.inner .second8{ --second-rotation: 48deg;}
+.inner .second9{ --second-rotation: 54deg;}
+.inner .second10{ --second-rotation: 60deg;}
+.inner .second11{ --second-rotation: 66deg;}
+.inner .second12{ --second-rotation: 72deg;}
+.inner .second13{ --second-rotation: 78deg;}
+.inner .second14{ --second-rotation: 84deg;}
+.inner .second15{ --second-rotation: 90deg;}
+.inner .second16{ --second-rotation: 96deg;}
+.inner .second17{ --second-rotation: 102deg;}
+.inner .second18{ --second-rotation: 108deg;}
+.inner .second19{ --second-rotation: 114deg;}
+.inner .second20{ --second-rotation: 120deg;}
+.inner .second21{ --second-rotation: 126deg;}
+.inner .second22{ --second-rotation: 132deg;}
+.inner .second23{ --second-rotation: 138deg;}
+.inner .second24{ --second-rotation: 144deg;}
+.inner .second25{ --second-rotation: 150deg;}
+.inner .second26{ --second-rotation: 156deg;}
+.inner .second27{ --second-rotation: 162deg;}
+.inner .second28{ --second-rotation: 168deg;}
+.inner .second29{ --second-rotation: 174deg;}
+.inner .second30{ --second-rotation: 180deg;}
+.inner .second31{ --second-rotation: 186deg;}
+.inner .second32{ --second-rotation: 192deg;}
+.inner .second33{ --second-rotation: 198deg;}
+.inner .second34{ --second-rotation: 204deg;}
+.inner .second35{ --second-rotation: 210deg;}
+.inner .second36{ --second-rotation: 216deg;}
+.inner .second37{ --second-rotation: 222deg;}
+.inner .second38{ --second-rotation: 228deg;}
+.inner .second39{ --second-rotation: 234deg;}
+.inner .second40{ --second-rotation: 240deg;}
+.inner .second41{ --second-rotation: 246deg;}
+.inner .second42{ --second-rotation: 252deg;}
+.inner .second43{ --second-rotation: 258deg;}
+.inner .second44{ --second-rotation: 264deg;}
+.inner .second45{ --second-rotation: 270deg;}
+.inner .second46{ --second-rotation: 276deg;}
+.inner .second47{ --second-rotation: 282deg;}
+.inner .second48{ --second-rotation: 288deg;}
+.inner .second49{ --second-rotation: 294deg;}
+.inner .second50{ --second-rotation: 300deg;}
+.inner .second51{ --second-rotation: 306deg;}
+.inner .second52{ --second-rotation: 312deg;}
+.inner .second53{ --second-rotation: 318deg;}
+.inner .second54{ --second-rotation: 324deg;}
+.inner .second55{ --second-rotation: 330deg;}
+.inner .second56{ --second-rotation: 336deg;}
+.inner .second57{ --second-rotation: 342deg;}
+.inner .second58{ --second-rotation: 348deg;}
+.inner .second59{ --second-rotation: 354deg;}
+.inner .second60{ --second-rotation: 0deg;}
+
+.inner .second::after{
+    content: '';
+    position: absolute;
+    background-color: red;
+    z-index: 12;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+}
+
+
+.time{
+    width: 750px;
+    height: 750px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18rem;
+    font-family: SevenSegment;
+    color: red;
+}
