@@ -1,5 +1,5 @@
 {
-  "name": "Radio Studio Monitor",
+  "name": "radiostudiomonitor",
   "version": "0.0.1",
   "description": "Radio Studio Monitor using socket io",
   "dependencies": {
