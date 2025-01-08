@@ -8,6 +8,7 @@ var path = require('path');
 require('dotenv').config()
 
 const appkey = process.env.APPKEY;
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
