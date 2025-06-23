@@ -8,6 +8,7 @@ var path = require('path');
 require('dotenv').config()
 
 const appkey = process.env.APPKEY;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -15,26 +16,33 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-app.get('/post', (req, res) => {
-    var socket = io;
+// Add body parser middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-    if(req.query.key != appkey){
-        return res.sendStatus(400);
-    }
+app.post('/', (req, res) => {
+  var socket = io;
+  if (!socket) {
+    return res.status(500).send('Socket.io not initialized');
+  }
 
-    if(req.query.artist) socket.emit('artist', req.query.artist);
+  console.log('Received POST request:', req.body);
+  if(req.body.key != appkey){
+    return res.sendStatus(400);
+  }
 
-    if (req.query.title) socket.emit('title', req.query.title);
+  // TODO: Validate the request body structure and content, Check types, etc.
+  if (req.body.artist) socket.emit('artist', req.body.artist);
+  if (req.body.title) socket.emit('title', req.body.title);
 
-    if (req.query.microphone) socket.emit('microphone', req.query.microphone);
-    
-    if (req.query.automation) socket.emit('automation', req.query.automation);
-  
-    if (req.query.eof) socket.emit('eof', req.query.eof);
+  // The following fields are optional and should be boolean values.
+  if ('microphone' in req.body) socket.emit('microphone', Boolean(req.body.microphone));
+  if ('automation' in req.body) socket.emit('automation', Boolean(req.body.automation));
+  if ('eof' in req.body) socket.emit('eof', Boolean(req.body.eof));
 
-    res.sendStatus(200);
-})
+  res.sendStatus(200);
+});
 
-server.listen(3000, () => {
-  console.log('listening on *:3000');
+server.listen(PORT, () => {
+  console.log(`Server Listening on: http://localhost:${PORT}`);
 });

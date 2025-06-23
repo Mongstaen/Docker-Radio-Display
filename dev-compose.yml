@@ -1,0 +1,25 @@
+---
+services:
+  docker-radio-display:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: docker-radio-display
+    environment:
+      - PORT=3000
+    ports:
+      - "3000:${PORT:-3000}"
+    # labels:
+    #  - traefik.enable=true
+    #  - traefik.http.routers.docker-radio-display-http.entrypoints=web
+    #  - traefik.http.routers.docker-radio-display-http.rule=Host(``)
+    #  - traefik.http.routers.docker-radio-display-https.entrypoints=websecure
+    #  - traefik.http.routers.docker-radio-display-https.rule=Host(``)
+    #  - traefik.http.routers.docker-radio-display-https.tls=true
+    #  - traefik.http.routers.docker-radio-display-https.tls.certresolver=cloudflare
+    #  - "com.centurylinklabs.watchtower.enable=true"
+    volumes:
+      - .:/app
+      - /app/src/node_modules
+    working_dir: /app/src
+    command: npm run dev
