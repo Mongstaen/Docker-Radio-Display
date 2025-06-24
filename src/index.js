@@ -12,7 +12,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger'); // path to swagger.js above
 
 
-const appkey = process.env.APPKEY;
+const appkey = process.env.APPKEY || 'yourappkey';
 const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -51,9 +51,11 @@ app.get('/', (req, res) => {
  *               artist:
  *                 type: string
  *                 description: Artist name
+ *                 example: 'Your Favourite Artist'
  *               title:
  *                 type: string
  *                 description: Track title
+ *                 example: 'The Best Song Ever'
  *               microphone:
  *                 type: boolean
  *                 description: Microphone status (on/off)
@@ -62,7 +64,7 @@ app.get('/', (req, res) => {
  *                 description: Automation status (on/off)
  *               eof:
  *                 type: boolean
- *                 description: End of file status
+ *                 description: End of file status (TBR)
  *     responses:
  *       200:
  *         description: Data successfully sent to clients
@@ -73,6 +75,7 @@ app.get('/', (req, res) => {
  */
 app.post('/', (req, res) => {
   var socket = io;
+  
   if (!socket) {
     return res.status(500).send('Socket.io not initialized');
   }
