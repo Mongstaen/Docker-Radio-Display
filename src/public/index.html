@@ -4,100 +4,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="style.css" />
+  
 </head>
 <body>
   <div id="app">
     <div class="left">
-      <div class="clock">
-        <!-- 12 bullets, one for every 5 mins -->
-        <div class="number number1"></div>
-        <div class="number number2"></div>
-        <div class="number number3"></div>
-        <div class="number number4"></div>
-        <div class="number number5"></div>
-        <div class="number number6"></div>
-        <div class="number number7"></div>
-        <div class="number number8"></div>
-        <div class="number number9"></div>
-        <div class="number number10"></div>
-        <div class="number number11"></div>
-        <div class="number number12"></div>
+      <div id="clock-container"></div>
+      <div id="countdown-container"></div>
 
-      
-        <!-- 60 bullets for seconds. -->
-        <div class="inner">
-          <div class="second second1" id="1"></div>
-          <div class="second second2" id="2"></div>
-          <div class="second second3" id="3"></div>
-          <div class="second second4" id="4"></div>
-          <div class="second second5" id="5"></div>
-          <div class="second second6" id="6"></div>
-          <div class="second second7" id="7"></div>
-          <div class="second second8" id="8"></div>
-          <div class="second second9" id="9"></div>
-          <div class="second second10" id="10"></div>
-          <div class="second second11" id="11"></div>
-          <div class="second second12" id="12"></div>
-          <div class="second second13" id="13"></div>
-          <div class="second second14" id="14"></div>
-          <div class="second second15" id="15"></div>
-          <div class="second second16" id="16"></div>
-          <div class="second second17" id="17"></div>
-          <div class="second second18" id="18"></div>
-          <div class="second second19" id="19"></div>
-          <div class="second second20" id="20"></div>
-          <div class="second second21" id="21"></div>
-          <div class="second second22" id="22"></div>
-          <div class="second second23" id="23"></div>
-          <div class="second second24" id="24"></div>
-          <div class="second second25" id="25"></div>
-          <div class="second second26" id="26"></div>
-          <div class="second second27" id="27"></div>
-          <div class="second second28" id="28"></div>
-          <div class="second second29" id="29"></div>
-          <div class="second second30" id="30"></div>
-          <div class="second second31" id="31"></div>
-          <div class="second second32" id="32"></div>
-          <div class="second second33" id="33"></div>
-          <div class="second second34" id="34"></div>
-          <div class="second second35" id="35"></div>
-          <div class="second second36" id="36"></div>
-          <div class="second second37" id="37"></div>
-          <div class="second second38" id="38"></div>
-          <div class="second second39" id="39"></div>
-          <div class="second second40" id="40"></div>
-          <div class="second second41" id="41"></div>
-          <div class="second second42" id="42"></div>
-          <div class="second second43" id="43"></div>
-          <div class="second second44" id="44"></div>
-          <div class="second second45" id="45"></div>
-          <div class="second second46" id="46"></div>
-          <div class="second second47" id="47"></div>
-          <div class="second second48" id="48"></div>
-          <div class="second second49" id="49"></div>
-          <div class="second second50" id="50"></div>
-          <div class="second second51" id="51"></div>
-          <div class="second second52" id="52"></div>
-          <div class="second second53" id="53"></div>
-          <div class="second second54" id="54"></div>
-          <div class="second second55" id="55"></div>
-          <div class="second second56" id="56"></div>
-          <div class="second second57" id="57"></div>
-          <div class="second second58" id="58"></div>
-          <div class="second second59" id="59"></div>
-          <div class="second second60" id="0"></div>
-        </div>
-
-        <!-- Display hours and minutes -->
-        <div class="time" onload="showTime()">
-          <p id="hour" class="hour"></p>
-          <p id="colon" class="colon">:</p>
-          <p id="minute" class="minute"></p>
-        </div>
-
-      </div>
-
-      <!-- Updates artist and title -->
       <div class="nowplaying">
         <h1 id="artistText"></h1>
         <h1 id="titleText"></h1>
@@ -122,8 +36,84 @@
 
 
   <script src="/socket.io/socket.io.js"></script>
-
   <script>
+    const now = new Date();
+    let timeDiffC = null;
+    const timeCorr = 500;
+    //let lastMinute = now.getMinutes(); // Variable to track the last minute value
+
+    function parseTimeStringToMillis(timeString) {
+      const [time, millis] = timeString.split('.');
+      const [hours, minutes, seconds] = time.split(':').map(Number);
+      return (hours * 3600000) + (minutes * 60000) + (seconds * 1000) + Number(millis);
+    }
+
+    function updateBClock() {
+      const clockContainer = document.getElementById("clock-container");
+      const countdownContainer = document.getElementById("countdown-container");
+
+      const now = new Date();
+      const currentSysTime = (now.getHours() * 3600000 + now.getMinutes() * 60000 + now.getSeconds() * 1000 + now.getMilliseconds());
+      const currentSysTimeAdj = (currentSysTime - timeDiffC);
+
+      const hours = Math.floor((currentSysTimeAdj / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((currentSysTimeAdj / (1000 * 60)) % 60);
+      const seconds = Math.floor((currentSysTimeAdj / 1000) % 60);
+
+      // Update time on the clock
+      const formattedTime = `<div class="innerClock"><p class="time">${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}</p><p class="seconds">${String(seconds).padStart(2, '0')}</p></div>`;
+      clockContainer.innerHTML = formattedTime;
+      updateDots(seconds, false); // Update dots without resetting on each second
+    }
+
+    function updateDots(currentSecond) {
+      const clockContainer = document.getElementById("clock-container");
+
+      // Remove existing dots before adding new ones
+      const existingDots = document.querySelectorAll('.dot');
+      existingDots.forEach(dot => dot.remove());
+
+      const radius = 250; // radius for the dots (adjust as needed)
+      const angleStep = 360 / 60; // 60 dots (for seconds)
+      const radiusM = 270; // radius for the Hour-dots (adjust as needed)
+      const angleStepM = 360 / 12; // 12 dots (for hours)
+
+      // Add hour dots (outer)
+      for (let i = 0; i < 12; i++) {
+        const angleM = (i * angleStepM) - (84.5 + angleStep);
+        const x = Math.cos(angleM * Math.PI / 180) * radiusM;
+        const y = Math.sin(angleM * Math.PI / 180) * radiusM;
+
+        const dot = document.createElement('div');
+        dot.classList.add('dot', 'hour-dot');
+        dot.style.left = `calc(50% + ${x}px)`;
+        dot.style.top = `calc(50% + ${y}px)`;
+        dot.style.backgroundColor = 'red'; // Highlight the current second with red
+        clockContainer.appendChild(dot);
+      }
+
+      // Add second dots (inner)
+      for (let i = 0; i < 60; i++) {
+        const angle = (i * angleStep) - (84.5 + angleStep);
+        const x = Math.cos(angle * Math.PI / 180) * radius;
+        const y = Math.sin(angle * Math.PI / 180) * radius;
+
+        const dot = document.createElement('div');
+        dot.classList.add('dot', 'second-dot');
+        dot.style.left = `calc(50% + ${x}px)`;
+        dot.style.top = `calc(50% + ${y}px)`;
+        if (i <= currentSecond) {
+          dot.style.backgroundColor = 'red'; // Highlight the current second with red
+        }
+
+        clockContainer.appendChild(dot);
+      }
+    }
+
+
+    updateBClock();
+    setInterval(updateBClock, 50);
+
     artistText = document.getElementById('artistText');
     titleText = document.getElementById('titleText');
     microphoneDiv = document.getElementById('microphoneDiv');
@@ -132,7 +122,9 @@
     automationText = document.getElementById('automationText');
     eofDiv = document.getElementById('eofDiv');
     eofText = document.getElementById('eofText');
+
     var socket = io();    
+    console.log(socket);
 
     socket.on('artist', function(artist) {
         artistText.innerText = artist;
@@ -142,93 +134,54 @@
         titleText.innerText = title;
     });
 
-    socket.on('microphone', function(microphone) {
-        if(microphone === 'true'){
-          microphoneText.innerText = "MIC ON";
-          microphoneDiv.className="right activeMicrophone";
-        }
-        if(microphone === 'false'){
-          microphoneText.innerText = "MIC OFF";
-          microphoneDiv.className="right inactiveMicrophone";
-        }
+    socket.on('microphone', function (microphone) {
+      if (microphone) {
+        microphoneText.innerText = "MIC ON";
+        microphoneDiv.className = "right activeMicrophone";
+      } else {
+        microphoneText.innerText = "MIC OFF";
+        microphoneDiv.className = "right inactiveMicrophone";
+      }
     });
 
     socket.on('automation', function(automation) {
-        if(automation === 'true'){
+        if(automation){
           automationText.innerText = "Auto Mode";
           automationDiv.className="right activeAutomation";
-        }
-        if(automation === 'false'){
+        } else {
+          console.log('Assist Mode');
           automationText.innerText = "Assist Mode";
           automationDiv.className="right inactiveAutomation";
         }
     });
     socket.on('eof', function(eof) {
-        console.log('eof');
         if(eof === 'true'){
           endOfFile();
           //eof = 'false';
         }
     });
-      
-    // Clock start
-    function showTime(){
-      date = new Date();
-      h = date.getHours();
-      m = date.getMinutes();
-      s = date.getSeconds();
 
-      h = (h < 10) ? "0" + h : h;
-      m = (m < 10) ? "0" + m : m;
-
-      document.getElementById("hour").innerText = h;
-      document.getElementById("minute").innerText = m;
-
-      document.getElementById(s).style = "display: inline;";
-
-      if(s === 0){
-        for(const x of Array(60).keys()){
-          // Clears all dots
-          document.getElementById(x).style = "display: none;";
-          // Adds the top dot
-          document.getElementById("0").style = "display: inline;";
-        }
-      }
-      setTimeout(showTime, 1000);
-    }
-    showTime();
-
-    function blinkColon(){
-      s = new Date().getSeconds();
-      if(s % 2 == 0){
-        document.getElementById("colon").style = "color: black;";
-      }
-      else{
-        document.getElementById("colon").style = "color: red;";
-      }
-      setTimeout(blinkColon, 1000);
-    }
-    blinkColon();
+    // TODO: Implement EOF function.
 
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
     async function endOfFile() {
-      let number = 9;
-      while(number != 0){
-        eofText.innerText = number;
-        if(number % 2 == 0){
-          eofDiv.className="right inactiveEOF";
+        let number = 9;
+        while (number != 0) {
+          eofText.innerText = number;
+          if (number % 2 == 0) {
+            eofDiv.className = "right inactiveEOF";
+          }
+          else {
+            eofDiv.className = "right activeEOF";
+          }
+          await sleep(1000);
+          number -= 1;
         }
-        else{
-          eofDiv.className="right activeEOF";
-        }
-        await sleep(1000);
-        number -= 1;
+        eofText.innerText = "EOF";
+        eofDiv.className = "right inactiveEOF";
       }
-      eofText.innerText = "EOF";
-      eofDiv.className="right inactiveEOF";
-    }
-
+ 
   </script>
 </body>
