@@ -122,7 +122,9 @@
     automationText = document.getElementById('automationText');
     eofDiv = document.getElementById('eofDiv');
     eofText = document.getElementById('eofText');
+
     var socket = io();    
+    console.log(socket);
 
     socket.on('artist', function(artist) {
         artistText.innerText = artist;
@@ -132,34 +134,54 @@
         titleText.innerText = title;
     });
 
-    socket.on('microphone', function(microphone) {
-        if(microphone === 'true'){
-          microphoneText.innerText = "MIC ON";
-          microphoneDiv.className="right activeMicrophone";
-        }
-        if(microphone === 'false'){
-          microphoneText.innerText = "MIC OFF";
-          microphoneDiv.className="right inactiveMicrophone";
-        }
+    socket.on('microphone', function (microphone) {
+      if (microphone) {
+        microphoneText.innerText = "MIC ON";
+        microphoneDiv.className = "right activeMicrophone";
+      } else {
+        microphoneText.innerText = "MIC OFF";
+        microphoneDiv.className = "right inactiveMicrophone";
+      }
     });
 
     socket.on('automation', function(automation) {
-        if(automation === 'true'){
+        if(automation){
           automationText.innerText = "Auto Mode";
           automationDiv.className="right activeAutomation";
-        }
-        if(automation === 'false'){
+        } else {
+          console.log('Assist Mode');
           automationText.innerText = "Assist Mode";
           automationDiv.className="right inactiveAutomation";
         }
     });
     socket.on('eof', function(eof) {
-        console.log('eof');
         if(eof === 'true'){
           endOfFile();
           //eof = 'false';
         }
     });
+
+    // TODO: Implement EOF function.
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    async function endOfFile() {
+        let number = 9;
+        while (number != 0) {
+          eofText.innerText = number;
+          if (number % 2 == 0) {
+            eofDiv.className = "right inactiveEOF";
+          }
+          else {
+            eofDiv.className = "right activeEOF";
+          }
+          await sleep(1000);
+          number -= 1;
+        }
+        eofText.innerText = "EOF";
+        eofDiv.className = "right inactiveEOF";
+      }
  
   </script>
 </body>
