@@ -117,8 +117,8 @@ app.post('/', (req, res) => {
       const isEndOfFile = endOfFile === true || endOfFile === 'true';
       socket.emit('end of file', isEndOfFile);
     } else {
-      console.warn('Invalid automation value:', endOfFile);
-      return res.status(400).send('Invalid automation value. Only true or false is allowed.');
+      console.warn('Invalid eof value:', endOfFile);
+      return res.status(400).send('Invalid eof value. Only true or false is allowed.');
     }
   }
 
