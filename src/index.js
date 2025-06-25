@@ -19,7 +19,33 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Add body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+
+const swaggerBasicAuth = (req, res, next) => {
+  const auth = req.headers.authorization;
+  if (!auth || !auth.startsWith('Basic ')) {
+    res.setHeader('WWW-Authenticate', 'Basic realm="Swagger API Documentation"');
+    return res.status(401).send('Authentication required for Swagger documentation');
+  }
+
+  const base64Credentials = auth.split(' ')[1];
+  const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+  const [username, password] = credentials.split(':');
+
+  // Use environment variables for credentials or set defaults
+  const validUsername = process.env.SWAGGER_USER || 'admin';
+  const validPassword = process.env.SWAGGER_PASSWORD || 'password';
+
+  if (username === validUsername && password === validPassword) {
+    return next();
+  }
+
+  res.setHeader('WWW-Authenticate', 'Basic realm="Swagger API Documentation"');
+  return res.status(401).send('Invalid credentials');
+};
+
+// Apply basic auth to Swagger UI
+app.use('/swagger', swaggerBasicAuth, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
@@ -82,7 +108,7 @@ app.post('/', (req, res) => {
 
   console.log('Received POST request:', req.body);
   if(req.body.key != appkey){
-    return res.sendStatus(400);
+    return res.status(400).json({ error: 'Invalid or missing appkey' });
   }
 
   // TODO: Validate the request body structure and content, Check types, etc.
