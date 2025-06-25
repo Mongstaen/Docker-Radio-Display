@@ -1,0 +1,33 @@
+const
+  URL = 'your endpoint'; //eg. 'http://192.168.1.2:3000'
+  APPKEY = 'yourappkey'; //eg. '1234567890abcdef'
+
+var
+  TITLE: string;
+  ARTIST: string;
+
+procedure OnLoad;
+begin
+  SystemLog('Loaded Docker-Radio-Display Helper Script');
+end;
+
+procedure OnAutomationOn(PlaylistIndex: integer);
+begin
+    ShellExecuteHidden('curl','--header "Content-Type: application/x-www-form-urlencoded" --data-urlencode "appkey='+ APPKEY +'" --data-urlencode "automation=true" "' + URL + '"');    
+
+end;
+
+procedure OnAutomationOff(PlaylistIndex: integer);
+begin
+    ShellExecuteHidden('curl','--header "Content-Type: application/x-www-form-urlencoded" --data-urlencode "appkey='+ APPKEY +'" --data-urlencode "automation=false" "' + URL + '"');    
+end;
+
+procedure OnPlayerStart(PlaylistIndex: integer; PlayerIndex: integer; Item: IPlaylistItem);
+begin
+  TITLE := Item.GetTitle;
+  ARTIST := Item.GetArtist;
+  ShellExecuteHidden('curl','--header "Content-Type: application/x-www-form-urlencoded" --data-urlencode "appkey='+ APPKEY +'" --data-urlencode "artist=' + ARTIST + '" --data-urlencode "title=' + TITLE + ' " "' + URL + '"');    
+end;
+
+begin
+end.
