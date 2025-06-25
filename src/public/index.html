@@ -127,7 +127,12 @@
     // Fetch initial data when the page loads
     document.addEventListener('DOMContentLoaded', function() {
       fetch('/lastUpdate')
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Fetch error: ${response.status} ${response.statusText}`);
+          }
+          return response.json();
+        })
         .then(data => {
           // Update the UI with the retrieved data
           if (data.artist) artistText.innerText = data.artist;
