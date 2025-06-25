@@ -4,7 +4,7 @@
   "description": "Radio Studio Monitor using socket io",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js --ignore lastUpdate.json"
+    "dev": "nodemon src/index.js --ignore src/lastUpdate.json"
   },
   "dependencies": {
     "dotenv": "^16.0.1",  
