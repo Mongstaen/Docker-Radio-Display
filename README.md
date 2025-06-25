@@ -17,6 +17,8 @@ Some updates, added swagger endpoint protected by basic auth. Credentials can be
 
 ## Installation
 
+Start the container with the following command:
+
 ```
 docker run -d \
  --name docker-radio-display \
@@ -25,6 +27,18 @@ docker run -d \
  -e SWAGGER_PASSWORD=password \
  ghcr.io/mongstaen/docker-radio-display:latest
 ```
+
+### mAirlist configuration
+
+Add mAirlist.mls to your mAirlist configuration folder, change the values in the const:
+
+```pascal
+const
+  URL = 'your endpoint'; //eg. 'http://192.168.1.2:3000'
+  APPKEY = 'yourappkey'; //eg. '1234567890abcdef'
+```
+
+Then go to mAirlist -> Control Panel -> Background Scripts and add the script to the list. Make sure to enable it.
 
 ## Contribute?
 
