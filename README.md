@@ -2,7 +2,7 @@
 
 This small app is intended for use on LAN, hence the low - to non existing - security features. Currently running on a Raspberry Pi in our local radio studio. All services hosted on the Raspberry Pi itself, running alongside mAirlist Radio Automation.
 
-Some updates, added swagger endpoint protected by basic auth. Credentials can be set in the enviroment variables `SWAGGER_USER` and `SWAGGER_PASSWORD`. Default is `admin` and `password`.
+Some updates, added swagger endpoint protected by basic auth. Credentials can be set in the environment variables `SWAGGER_USER` and `SWAGGER_PASSWORD`. Default is `admin` and `password`.
 
 ## Features
 
@@ -13,16 +13,18 @@ Some updates, added swagger endpoint protected by basic auth. Credentials can be
 ## Maybe in the future
 
 - Show current song playing in other software (e.g. Mixxx)
-- Shwo current weather in your area?
+- Show current weather in your area?
 
 ## Installation
 
+```
 docker run -d \
  --name docker-radio-display \
  -p 3000:3000 \
  -e SWAGGER_USER=admin \
  -e SWAGGER_PASSWORD=password \
  ghcr.io/mongstaen/docker-radio-display:latest
+```
 
 ## Contribute?
 

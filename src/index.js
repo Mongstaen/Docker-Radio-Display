@@ -60,7 +60,7 @@ app.get('/', (req, res) => {
  *     summary: Send data to connected clients
  *     description: Updates artist, title, microphone, automation, and end of file status
  *     security:
- *       - key: []
+ *       - appkey: []
  *     requestBody:
  *       required: true
  *       content:
@@ -68,9 +68,9 @@ app.get('/', (req, res) => {
  *           schema:
  *             type: object
  *             required:
- *               - key
+ *               - appkey
  *             properties:
- *               key:
+ *               appkey:
  *                 type: string
  *                 example: 'yourappkey'
  *                 description: API key for authentication
@@ -106,8 +106,14 @@ app.post('/', (req, res) => {
     return res.status(500).send('Socket.io not initialized');
   }
 
-  console.log('Received POST request:', req.body);
-  if(req.body.key != appkey){
+  if (process.env.NODE_ENV !== 'production') {
+    const { key, ...sanitizedBody } = req.body;
+    console.log('Received POST request with sanitized body:', sanitizedBody);
+  } else {
+    console.log('Received POST request');
+  }
+
+  if(String(req.body.appkey) !== appkey){
     return res.status(400).json({ error: 'Invalid or missing appkey' });
   }
 
