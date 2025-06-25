@@ -1,27 +1,37 @@
 ## Radio Studio Monitor
+
 This small app is intended for use on LAN, hence the low - to non existing - security features. Currently running on a Raspberry Pi in our local radio studio. All services hosted on the Raspberry Pi itself, running alongside mAirlist Radio Automation.
 
-Not planning to rewrite. But note to POST data to this app..We use HTTP GET.. Smart for a newbie in 2022.
-Required for /post
-  - key=yourappkey
-Expected fields to update now playing:
-  - artist
-    - artist=Artist
-  - title
-    - title=Title
+Some updates, added swagger endpoint protected by basic auth. Credentials can be set in the enviroment variables `SWAGGER_USER` and `SWAGGER_PASSWORD`. Default is `admin` and `password`.
 
-Example
+## Features
 
-`HTTP GET: localhost:3000/post?key=yourappkey&artist=Artist&title=Title`
+- Show current song playing in mAirlist
+- Show microphone state
+- Show mAirlist automation state
 
-Expected to update microphone - true/false
+## Maybe in the future
 
-`HTTP GET: localhost:3000/post?key=yourappkey&microphone=false`
+- Show current song playing in other software (e.g. Mixxx)
+- Shwo current weather in your area?
 
-Expected to update Auto mode - true/false
+## Installation
 
-`HTTP GET: localhost:3000/post?key=yourappkey&automation=true`
+docker run -d \
+ --name docker-radio-display \
+ -p 3000:3000 \
+ -e SWAGGER_USER=admin \
+ -e SWAGGER_PASSWORD=password \
+ ghcr.io/mongstaen/docker-radio-display:latest
 
-#
-Buy me a coffee? :) 
+## Contribute?
+
+If you want to contribute, feel free to open an issue or a pull request. If you have any suggestions or ideas, please let me know.
+Looking for someone to help maintaining this project.
+
+## Video
+
+[![Watch the video](https://img.youtube.com/vi/raYs-18zn80/maxresdefault.jpg)](https://www.youtube.com/watch?v=raYs-18zn80)
+
+Buy me a coffee? :)
 https://www.buymeacoffee.com/mongstad

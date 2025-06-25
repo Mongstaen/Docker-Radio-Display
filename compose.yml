@@ -7,6 +7,10 @@ services:
   docker-radio-display:
     image: ghcr.io/mongstaen/docker-radio-display:latest
     container_name: docker-radio-display
+    environment:
+      - APPKEY=yourappkey
+      - SWAGGER_USER=swagger
+      - SWAGGER_PASSWORD=swagger
     labels:
       - traefik.enable=true
       - traefik.http.routers.docker-radio-display-http.entrypoints=web
