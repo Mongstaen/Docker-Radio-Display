@@ -37,6 +37,7 @@
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
+
     const now = new Date();
     let timeDiffC = null;
     const timeCorr = 500;
@@ -123,6 +124,42 @@
     eofDiv = document.getElementById('eofDiv');
     eofText = document.getElementById('eofText');
 
+    // Fetch initial data when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      fetch('/lastUpdate')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Fetch error: ${response.status} ${response.statusText}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Update the UI with the retrieved data
+          if (data.artist) artistText.innerText = data.artist;
+          if (data.title) titleText.innerText = data.title;
+          
+          if (data.microphone === 'true') {
+            microphoneText.innerText = "MIC ON";
+            microphoneDiv.className = "right activeMicrophone";
+          } else {
+            microphoneText.innerText = "MIC OFF";
+            microphoneDiv.className = "right inactiveMicrophone";
+          }
+          
+          if (data.automation === 'true') {
+            automationText.innerText = "Auto Mode";
+            automationDiv.className = "right activeAutomation";
+          } else {
+            automationText.innerText = "Assist Mode";
+            automationDiv.className = "right inactiveAutomation";
+          }
+          
+          if (data.eof === 'true') {
+            endOfFile();
+          }
+        })
+        .catch(error => console.error('Error fetching initial data:', error));
+    });
     var socket = io();    
     console.log(socket);
 
@@ -149,7 +186,6 @@
           automationText.innerText = "Auto Mode";
           automationDiv.className="right activeAutomation";
         } else {
-          console.log('Assist Mode');
           automationText.innerText = "Assist Mode";
           automationDiv.className="right inactiveAutomation";
         }
