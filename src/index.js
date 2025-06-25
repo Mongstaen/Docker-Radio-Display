@@ -7,6 +7,17 @@ const io = new Server(server);
 var path = require('path');
 require('dotenv').config()
 
+const fs = require('fs');
+const DATA_FILE = path.join(__dirname, 'lastUpdate.json');
+
+function loadCurrentData() {
+  if (fs.existsSync(DATA_FILE)) {
+    const data = fs.readFileSync(DATA_FILE, 'utf8');
+    return JSON.parse(data);
+  }
+  return {};
+}
+
 // TODO: Add Swagger documentation and set up correctly
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger'); // path to swagger.js above
@@ -16,7 +27,6 @@ const appkey = process.env.APPKEY || 'yourappkey';
 const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
-// Add body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -32,7 +42,6 @@ const swaggerBasicAuth = (req, res, next) => {
   const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
   const [username, password] = credentials.split(':');
 
-  // Use environment variables for credentials or set defaults
   const validUsername = process.env.SWAGGER_USER || 'admin';
   const validPassword = process.env.SWAGGER_PASSWORD || 'password';
 
@@ -44,15 +53,20 @@ const swaggerBasicAuth = (req, res, next) => {
   return res.status(401).send('Invalid credentials');
 };
 
-// Apply basic auth to Swagger UI
 app.use('/swagger', swaggerBasicAuth, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
+app.get('/lastUpdate', (req, res) => {
+  const currentData = loadCurrentData();  
+  if (Object.keys(currentData).length === 0) {
+    return res.status(404).json({ error: 'No data found' });
+  }
+  res.json(currentData);
+});
 
-// TODO.. Add Swagger documentation for the POST and make it work..
 /**
  * @swagger
  * /:
@@ -116,6 +130,23 @@ app.post('/', (req, res) => {
   if(String(req.body.appkey) !== appkey){
     return res.status(400).json({ error: 'Invalid or missing appkey' });
   }
+
+  const allowedKeys = ['artist', 'title', 'microphone', 'automation'];
+  const filtered = {};
+
+  for (const key of allowedKeys) {
+    if (key in req.body) filtered[key] = req.body[key];
+  }
+  if (Object.keys(filtered).length === 0) {
+    return res.status(400).json({ error: 'No valid keys provided in the request body' });
+  }
+  const currentData = loadCurrentData();
+  const updatedData = { ...currentData, ...filtered };
+  fs.writeFile(DATA_FILE, JSON.stringify(updatedData), (err) => {
+    if (err) {
+      console.error('Error writing to data file:', err);
+    }
+  });
 
   // TODO: Validate the request body structure and content, Check types, etc.
   if (req.body.artist) socket.emit('artist', req.body.artist);
