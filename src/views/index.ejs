@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <head>
   <title>Radio studio monitor</title>
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap"
+    rel="stylesheet"
+  />
   <link rel="stylesheet" type="text/css" href="style.css" />
-  
 </head>
 <body>
   <div id="app">
@@ -16,37 +18,38 @@
         <h1 id="artistText"></h1>
         <h1 id="titleText"></h1>
       </div>
-
     </div>
 
     <div class="container">
+      <% if (displayMicrophone) { %>
       <div id="microphoneDiv" class="right inactiveMicrophone">
         <h1 id="microphoneText">MIC OFF</h1>
       </div>
-
+      <% } %> <% if (displayAutomation) { %>
       <div id="automationDiv" class="right inactiveAutomation">
         <h1 id="automationText">Assist Mode</h1>
       </div>
-
+      <% } %> <% if (displayEOF) { %>
       <div id="eofDiv" class="right inactiveEOF">
         <h1 id="eofText">EOF</h1>
       </div>
-    </div>    
+      <% } %>
+    </div>
   </div>
-
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
-
     const now = new Date();
     let timeDiffC = null;
     const timeCorr = 500;
     //let lastMinute = now.getMinutes(); // Variable to track the last minute value
 
     function parseTimeStringToMillis(timeString) {
-      const [time, millis] = timeString.split('.');
-      const [hours, minutes, seconds] = time.split(':').map(Number);
-      return (hours * 3600000) + (minutes * 60000) + (seconds * 1000) + Number(millis);
+      const [time, millis] = timeString.split(".");
+      const [hours, minutes, seconds] = time.split(":").map(Number);
+      return (
+        hours * 3600000 + minutes * 60000 + seconds * 1000 + Number(millis)
+      );
     }
 
     function updateBClock() {
@@ -54,15 +57,24 @@
       const countdownContainer = document.getElementById("countdown-container");
 
       const now = new Date();
-      const currentSysTime = (now.getHours() * 3600000 + now.getMinutes() * 60000 + now.getSeconds() * 1000 + now.getMilliseconds());
-      const currentSysTimeAdj = (currentSysTime - timeDiffC);
+      const currentSysTime =
+        now.getHours() * 3600000 +
+        now.getMinutes() * 60000 +
+        now.getSeconds() * 1000 +
+        now.getMilliseconds();
+      const currentSysTimeAdj = currentSysTime - timeDiffC;
 
       const hours = Math.floor((currentSysTimeAdj / (1000 * 60 * 60)) % 24);
       const minutes = Math.floor((currentSysTimeAdj / (1000 * 60)) % 60);
       const seconds = Math.floor((currentSysTimeAdj / 1000) % 60);
 
       // Update time on the clock
-      const formattedTime = `<div class="innerClock"><p class="time">${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}</p><p class="seconds">${String(seconds).padStart(2, '0')}</p></div>`;
+      const formattedTime = `<div class="innerClock"><p class="time">${String(
+        hours
+      ).padStart(2, "0")}:${String(minutes).padStart(
+        2,
+        "0"
+      )}</p><p class="seconds">${String(seconds).padStart(2, "0")}</p></div>`;
       clockContainer.innerHTML = formattedTime;
       updateDots(seconds, false); // Update dots without resetting on each second
     }
@@ -71,8 +83,8 @@
       const clockContainer = document.getElementById("clock-container");
 
       // Remove existing dots before adding new ones
-      const existingDots = document.querySelectorAll('.dot');
-      existingDots.forEach(dot => dot.remove());
+      const existingDots = document.querySelectorAll(".dot");
+      existingDots.forEach((dot) => dot.remove());
 
       const radius = 250; // radius for the dots (adjust as needed)
       const angleStep = 360 / 60; // 60 dots (for seconds)
@@ -81,97 +93,98 @@
 
       // Add hour dots (outer)
       for (let i = 0; i < 12; i++) {
-        const angleM = (i * angleStepM) - (84.5 + angleStep);
-        const x = Math.cos(angleM * Math.PI / 180) * radiusM;
-        const y = Math.sin(angleM * Math.PI / 180) * radiusM;
+        const angleM = i * angleStepM - (84.5 + angleStep);
+        const x = Math.cos((angleM * Math.PI) / 180) * radiusM;
+        const y = Math.sin((angleM * Math.PI) / 180) * radiusM;
 
-        const dot = document.createElement('div');
-        dot.classList.add('dot', 'hour-dot');
+        const dot = document.createElement("div");
+        dot.classList.add("dot", "hour-dot");
         dot.style.left = `calc(50% + ${x}px)`;
         dot.style.top = `calc(50% + ${y}px)`;
-        dot.style.backgroundColor = 'red'; // Highlight the current second with red
+        dot.style.backgroundColor = "red"; // Highlight the current second with red
         clockContainer.appendChild(dot);
       }
 
       // Add second dots (inner)
       for (let i = 0; i < 60; i++) {
-        const angle = (i * angleStep) - (84.5 + angleStep);
-        const x = Math.cos(angle * Math.PI / 180) * radius;
-        const y = Math.sin(angle * Math.PI / 180) * radius;
+        const angle = i * angleStep - (84.5 + angleStep);
+        const x = Math.cos((angle * Math.PI) / 180) * radius;
+        const y = Math.sin((angle * Math.PI) / 180) * radius;
 
-        const dot = document.createElement('div');
-        dot.classList.add('dot', 'second-dot');
+        const dot = document.createElement("div");
+        dot.classList.add("dot", "second-dot");
         dot.style.left = `calc(50% + ${x}px)`;
         dot.style.top = `calc(50% + ${y}px)`;
         if (i <= currentSecond) {
-          dot.style.backgroundColor = 'red'; // Highlight the current second with red
+          dot.style.backgroundColor = "red"; // Highlight the current second with red
         }
 
         clockContainer.appendChild(dot);
       }
     }
 
-
     updateBClock();
     setInterval(updateBClock, 50);
 
-    artistText = document.getElementById('artistText');
-    titleText = document.getElementById('titleText');
-    microphoneDiv = document.getElementById('microphoneDiv');
-    microphoneText = document.getElementById('microphoneText');
-    automationDiv = document.getElementById('automationDiv');
-    automationText = document.getElementById('automationText');
-    eofDiv = document.getElementById('eofDiv');
-    eofText = document.getElementById('eofText');
+    artistText = document.getElementById("artistText");
+    titleText = document.getElementById("titleText");
+    microphoneDiv = document.getElementById("microphoneDiv");
+    microphoneText = document.getElementById("microphoneText");
+    automationDiv = document.getElementById("automationDiv");
+    automationText = document.getElementById("automationText");
+    eofDiv = document.getElementById("eofDiv");
+    eofText = document.getElementById("eofText");
 
     // Fetch initial data when the page loads
-    document.addEventListener('DOMContentLoaded', function() {
-      fetch('/lastUpdate')
-        .then(response => {
+    document.addEventListener("DOMContentLoaded", function () {
+      fetch("/lastUpdate")
+        .then((response) => {
           if (!response.ok) {
-            throw new Error(`Fetch error: ${response.status} ${response.statusText}`);
+            throw new Error(
+              `Fetch error: ${response.status} ${response.statusText}`
+            );
           }
           return response.json();
         })
-        .then(data => {
+        .then((data) => {
           // Update the UI with the retrieved data
           if (data.artist) artistText.innerText = data.artist;
           if (data.title) titleText.innerText = data.title;
-          
-          if (data.microphone === 'true') {
+
+          if (data.microphone === "true") {
             microphoneText.innerText = "MIC ON";
             microphoneDiv.className = "right activeMicrophone";
           } else {
             microphoneText.innerText = "MIC OFF";
             microphoneDiv.className = "right inactiveMicrophone";
           }
-          
-          if (data.automation === 'true') {
+
+          if (data.automation === "true") {
             automationText.innerText = "Auto Mode";
             automationDiv.className = "right activeAutomation";
           } else {
             automationText.innerText = "Assist Mode";
             automationDiv.className = "right inactiveAutomation";
           }
-          
-          if (data.eof === 'true') {
+
+          if (data.eof === "true") {
             endOfFile();
           }
         })
-        .catch(error => console.error('Error fetching initial data:', error));
+        .catch((error) => console.error("Error fetching initial data:", error));
     });
-    var socket = io();    
+    var socket = io();
     console.log(socket);
 
-    socket.on('artist', function(artist) {
-        artistText.innerText = artist;
+    socket.on("artist", function (artist) {
+      artistText.innerText = artist;
     });
 
-    socket.on('title', function(title) {
-        titleText.innerText = title;
+    socket.on("title", function (title) {
+      titleText.innerText = title;
     });
 
-    socket.on('microphone', function (microphone) {
+    socket.on("microphone", function (microphone) {
       if (microphone) {
         microphoneText.innerText = "MIC ON";
         microphoneDiv.className = "right activeMicrophone";
@@ -181,43 +194,41 @@
       }
     });
 
-    socket.on('automation', function(automation) {
-        if(automation){
-          automationText.innerText = "Auto Mode";
-          automationDiv.className="right activeAutomation";
-        } else {
-          automationText.innerText = "Assist Mode";
-          automationDiv.className="right inactiveAutomation";
-        }
+    socket.on("automation", function (automation) {
+      if (automation) {
+        automationText.innerText = "Auto Mode";
+        automationDiv.className = "right activeAutomation";
+      } else {
+        automationText.innerText = "Assist Mode";
+        automationDiv.className = "right inactiveAutomation";
+      }
     });
-    socket.on('eof', function(eof) {
-        if(eof === 'true'){
-          endOfFile();
-          //eof = 'false';
-        }
+    socket.on("eof", function (eof) {
+      if (eof === "true") {
+        endOfFile();
+        //eof = 'false';
+      }
     });
 
     // TODO: Implement EOF function.
 
     function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
+      return new Promise((resolve) => setTimeout(resolve, ms));
     }
     async function endOfFile() {
-        let number = 9;
-        while (number != 0) {
-          eofText.innerText = number;
-          if (number % 2 == 0) {
-            eofDiv.className = "right inactiveEOF";
-          }
-          else {
-            eofDiv.className = "right activeEOF";
-          }
-          await sleep(1000);
-          number -= 1;
+      let number = 9;
+      while (number != 0) {
+        eofText.innerText = number;
+        if (number % 2 == 0) {
+          eofDiv.className = "right inactiveEOF";
+        } else {
+          eofDiv.className = "right activeEOF";
         }
-        eofText.innerText = "EOF";
-        eofDiv.className = "right inactiveEOF";
+        await sleep(1000);
+        number -= 1;
       }
- 
+      eofText.innerText = "EOF";
+      eofDiv.className = "right inactiveEOF";
+    }
   </script>
 </body>
