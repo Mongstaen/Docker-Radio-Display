@@ -47,14 +47,15 @@ div.left{
 div.container{
     min-width: 34vw;
     height: 100vh;
+    display: flex;
+    flex-direction: column;
     font-family: Roboto;
     font-style: normal;
     font-size: 48px;
     font-weight: bold;
 }
 div.right{
-    width: auto;
-    height: 33.4vh;
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;

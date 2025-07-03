@@ -4,10 +4,11 @@
   "description": "Radio Studio Monitor using socket io",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js --ignore src/lastUpdate.json"
+    "dev": "nodemon src/index.js --ignore src/lastUpdate.json --watch views --ext js, ejs, mjs, json"
   },
   "dependencies": {
-    "dotenv": "^16.0.1",  
+    "dotenv": "^16.0.1",
+    "ejs": "^3.1.10",
     "express": "^4.18.1",
     "socket.io": "^4.5.1",
     "swagger-jsdoc": "^6.2.8",
