@@ -209,7 +209,7 @@ app.post("/", (req, res) => {
       endOfFile === "false"
     ) {
       const isEndOfFile = endOfFile === true || endOfFile === "true";
-      socket.emit("end of file", isEndOfFile);
+      socket.emit("eof", isEndOfFile);
     } else {
       console.warn("Invalid eof value:", endOfFile);
       return res
