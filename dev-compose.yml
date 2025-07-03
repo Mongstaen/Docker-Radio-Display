@@ -10,6 +10,11 @@ services:
       - APPKEY=yourappkey
       - SWAGGER_USER=swagger
       - SWAGGER_PASSWORD=swagger
+      - NODE_ENV=production
+      # Right panel settings, if not set. Defaults to true.
+      - DISPLAY_MICROPHONE=false
+      - DISPLAY_AUTOMATION=true
+      - DISPLAY_EOF=false
     ports:
       - "3000:${PORT:-3000}"
     # labels:
@@ -21,8 +26,8 @@ services:
     #  - traefik.http.routers.docker-radio-display-https.tls=true
     #  - traefik.http.routers.docker-radio-display-https.tls.certresolver=cloudflare
     #  - "com.centurylinklabs.watchtower.enable=true"
-    volumes:
-      - .:/app
-      - /app/src/node_modules
-    working_dir: /app/src
-    command: ["sh", "-c", "npm update && npm install && npm run dev"]
+    #volumes:
+      #- .:/app
+      #- /app/src/node_modules
+    #working_dir: /app/src
+    #command: ["sh", "-c", "npm ci && npm run dev"]
