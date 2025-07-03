@@ -146,7 +146,7 @@ app.post("/", (req, res) => {
     return res.status(400).json({ error: "Invalid or missing appkey" });
   }
 
-  const allowedKeys = ["artist", "title", "microphone", "automation"];
+  const allowedKeys = ["artist", "title", "microphone", "automation", "eof"];
   const filtered = {};
 
   for (const key of allowedKeys) {
