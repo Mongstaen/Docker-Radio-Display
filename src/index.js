@@ -146,7 +146,7 @@ app.post("/", (req, res) => {
     return res.status(400).json({ error: "Invalid or missing appkey" });
   }
 
-  const allowedKeys = ["artist", "title", "microphone", "automation"];
+  const allowedKeys = ["artist", "title", "microphone", "automation", "eof"];
   const filtered = {};
 
   for (const key of allowedKeys) {
@@ -205,11 +205,11 @@ app.post("/", (req, res) => {
     if (
       endOfFile === true ||
       endOfFile === false ||
-      endOfFile === "true" ||
-      endOfFile === "false"
+      String(endOfFile) === "true" ||
+      String(endOfFile) === "false"
     ) {
-      const isEndOfFile = endOfFile === true || endOfFile === "true";
-      socket.emit("end of file", isEndOfFile);
+      const isEndOfFile = endOfFile === true || String(endOfFile) === "true";
+      socket.emit("eof", isEndOfFile);
     } else {
       console.warn("Invalid eof value:", endOfFile);
       return res
