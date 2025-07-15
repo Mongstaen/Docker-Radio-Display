@@ -1,49 +1,133 @@
 ## Radio Studio Monitor
 
-This small app is intended for use on LAN, hence the low - to non existing - security features. Currently running on a Raspberry Pi in our local radio studio. All services hosted on the Raspberry Pi itself, running alongside mAirlist Radio Automation.
-
-Some updates, added swagger endpoint protected by basic auth. Credentials can be set in the environment variables `SWAGGER_USER` and `SWAGGER_PASSWORD`. Default is `admin` and `password`.
+This Node.js web application provides a real-time radio studio monitor for mAirlist Radio Automation software. Designed for LAN use with minimal security features, it's perfect for radio studio environments where you need to display current song information and studio status.
 
 ## Features
 
-- Show current song playing in mAirlist
-- Show microphone state
-- Show mAirlist automation state
+- **Real-time display**: Shows current song (artist/title) playing in mAirlist
+- **Studio status indicators**: 
+  - Microphone state (on/off)
+  - Automation mode (Auto/Assist)
+  - End of file countdown with visual indicator
+- **Visual clock**: Analog-style clock with seconds display and countdown dots
+- **Swagger API documentation**: Protected endpoint for API testing and documentation
+- **Configurable display**: Toggle visibility of microphone, automation, and EOF indicators
+- **Data persistence**: Maintains last known state between restarts
+- **Docker support**: Easy deployment with Docker and Docker Compose
 
-## Maybe in the future
+## Environment Configuration
 
-- Show current song playing in other software (e.g. Mixxx)
-- Show current weather in your area?
+All display elements can be configured via environment variables:
+
+- `APPKEY` - API authentication key (default: "yourappkey")
+- `PORT` - Server port (default: 3000)
+- `SWAGGER_USER` - Swagger UI username (default: "admin")  
+- `SWAGGER_PASSWORD` - Swagger UI password (default: "password")
+- `DISPLAY_MICROPHONE` - Show microphone status (default: true)
+- `DISPLAY_AUTOMATION` - Show automation status (default: true)
+- `DISPLAY_EOF` - Show end-of-file countdown (default: true)
+- `NODE_ENV` - Environment mode (affects logging verbosity)
 
 ## Installation
 
-Start the container with the following command:
+### Quick Start with Docker
 
-```
+```bash
 docker run -d \
- --name docker-radio-display \
- -p 3000:3000 \
- -e SWAGGER_USER=admin \
- -e SWAGGER_PASSWORD=password \
- ghcr.io/mongstaen/docker-radio-display:latest
+  --name docker-radio-display \
+  -p 3000:3000 \
+  -e APPKEY=yourappkey \
+  -e SWAGGER_USER=admin \
+  -e SWAGGER_PASSWORD=password \
+  ghcr.io/mongstaen/docker-radio-display:latest
 ```
 
-### mAirlist configuration
+### Docker Compose (Recommended)
 
-Add mAirlist.mls to your mAirlist configuration folder, change the values in the const:
-
-```pascal
-const
-  URL = 'your endpoint'; //eg. 'http://192.168.1.2:3000'
-  APPKEY = 'yourappkey'; //eg. '1234567890abcdef'
+For development:
+```bash
+docker-compose -f dev-compose.yml up
 ```
 
-Then go to mAirlist -> Control Panel -> Background Scripts and add the script to the list. Make sure to enable it.
+For production:
+```bash
+docker-compose -f compose.yml up
+```
 
-## Contribute?
+### Local Development
+
+```bash
+# Navigate to src directory
+cd src
+
+# Install dependencies
+npm install
+
+# Start development server with auto-reload
+npm run dev
+
+# Or start production server
+npm start
+```
+
+The application will be available at `http://localhost:3000`
+
+## mAirlist Integration
+
+### Setup Steps
+
+1. **Configure the Pascal Script**: Edit `mAirlist.mls` and update the constants:
+   ```pascal
+   const
+     URL = 'your endpoint'; //eg. 'http://192.168.1.2:3000'
+     APPKEY = 'yourappkey'; //eg. '1234567890abcdef'
+   ```
+
+2. **Install in mAirlist**: 
+   - Copy `mAirlist.mls` to your mAirlist configuration folder
+   - Go to mAirlist → Control Panel → Background Scripts
+   - Add the script to the list and enable it
+
+3. **Verify Integration**: The script will automatically send updates to your display when:
+   - A new song starts playing
+   - Microphone state changes
+   - Automation mode switches
+   - End of file events occur
+
+### API Endpoints
+
+- `GET /` - Main display interface
+- `GET /lastUpdate` - Get current status data (JSON)
+- `POST /` - Update status (requires APPKEY authentication)
+- `GET /swagger` - API documentation (requires basic auth)
+
+## Development
+
+### Project Structure
+
+```
+src/
+├── index.js          # Main Express server with Socket.IO
+├── swagger.js        # Swagger API documentation config
+├── views/
+│   └── index.ejs     # Frontend template
+├── public/
+│   ├── style.css     # Styling
+│   └── Seven Segment.ttf  # Custom font
+└── package.json      # Dependencies and scripts
+```
+
+### Contributing
 
 If you want to contribute, feel free to open an issue or a pull request. If you have any suggestions or ideas, please let me know.
 Looking for someone to help maintaining this project.
+
+### Future Ideas
+
+- Support for other radio automation software (e.g. Mixxx)
+- Weather display integration
+- Enhanced visual themes
+- Mobile-responsive design
 
 ## Video
 

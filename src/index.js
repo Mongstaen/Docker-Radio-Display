@@ -111,6 +111,10 @@ app.get("/lastUpdate", (req, res) => {
  *                 type: string
  *                 description: Track title
  *                 example: 'The Best Song Ever'
+ *               duration:
+ *                 type: string
+ *                 description: Song duration in HH:MM:SS format
+ *                 example: '00:03:45'
  *               microphone:
  *                 type: boolean
  *                 description: Microphone status (on/off)
@@ -168,6 +172,7 @@ app.post("/", (req, res) => {
   // TODO: Validate the request body structure and content, Check types, etc.
   if (req.body.artist) socket.emit("artist", req.body.artist);
   if (req.body.title) socket.emit("title", req.body.title);
+  if (req.body.duration) socket.emit("duration", req.body.duration);
 
   if ("microphone" in req.body) {
     const mic = req.body.microphone;

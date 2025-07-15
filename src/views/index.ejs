@@ -17,6 +17,7 @@
       <div class="nowplaying">
         <h1 id="artistText"></h1>
         <h1 id="titleText"></h1>
+        <h2 id="durationText" style="display: none;"></h2>
       </div>
     </div>
 
@@ -128,12 +129,58 @@
 
     artistText = document.getElementById("artistText");
     titleText = document.getElementById("titleText");
+    durationText = document.getElementById("durationText");
     microphoneDiv = document.getElementById("microphoneDiv");
     microphoneText = document.getElementById("microphoneText");
     automationDiv = document.getElementById("automationDiv");
     automationText = document.getElementById("automationText");
     eofDiv = document.getElementById("eofDiv");
     eofText = document.getElementById("eofText");
+
+    let durationInterval = null;
+    let currentDurationSeconds = 0;
+
+    function parseTimeToSeconds(timeString) {
+      const parts = timeString.split(':');
+      const hours = parseInt(parts[0], 10);
+      const minutes = parseInt(parts[1], 10);
+      const seconds = parseInt(parts[2], 10);
+      return hours * 3600 + minutes * 60 + seconds;
+    }
+
+    function formatSecondsToTime(totalSeconds) {
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function startDurationCountdown(durationString) {
+      // Clear any existing interval
+      if (durationInterval) {
+        clearInterval(durationInterval);
+      }
+      
+      // Parse duration and start countdown
+      currentDurationSeconds = parseTimeToSeconds(durationString);
+      
+      if (currentDurationSeconds > 0) {
+        durationText.style.display = 'block';
+        durationText.innerText = formatSecondsToTime(currentDurationSeconds);
+        
+        durationInterval = setInterval(() => {
+          currentDurationSeconds--;
+          
+          if (currentDurationSeconds <= 0) {
+            clearInterval(durationInterval);
+            durationText.style.display = 'none';
+            durationInterval = null;
+          } else {
+            durationText.innerText = formatSecondsToTime(currentDurationSeconds);
+          }
+        }, 1000);
+      }
+    }
 
     // Fetch initial data when the page loads
     document.addEventListener("DOMContentLoaded", function () {
@@ -150,6 +197,7 @@
           // Update the UI with the retrieved data
           if (data.artist) artistText.innerText = data.artist;
           if (data.title) titleText.innerText = data.title;
+          if (data.duration) startDurationCountdown(data.duration);
 
           if (data.microphone === "true") {
             microphoneText.innerText = "MIC ON";
@@ -182,6 +230,10 @@
 
     socket.on("title", function (title) {
       titleText.innerText = title;
+    });
+
+    socket.on("duration", function (duration) {
+      startDurationCountdown(duration);
     });
 
     socket.on("microphone", function (microphone) {
