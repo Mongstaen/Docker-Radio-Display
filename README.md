@@ -5,7 +5,7 @@ This Node.js web application provides a real-time radio studio monitor for mAirl
 ## Features
 
 - **Real-time display**: Shows current song (artist/title) playing in mAirlist
-- **Studio status indicators**: 
+- **Studio status indicators**:
   - Microphone state (on/off)
   - Automation mode (Auto/Assist)
   - End of file countdown with visual indicator
@@ -21,7 +21,7 @@ All display elements can be configured via environment variables:
 
 - `APPKEY` - API authentication key (default: "yourappkey")
 - `PORT` - Server port (default: 3000)
-- `SWAGGER_USER` - Swagger UI username (default: "admin")  
+- `SWAGGER_USER` - Swagger UI username (default: "admin")
 - `SWAGGER_PASSWORD` - Swagger UI password (default: "password")
 - `DISPLAY_MICROPHONE` - Show microphone status (default: true)
 - `DISPLAY_AUTOMATION` - Show automation status (default: true)
@@ -45,11 +45,13 @@ docker run -d \
 ### Docker Compose (Recommended)
 
 For development:
+
 ```bash
 docker-compose -f dev-compose.yml up
 ```
 
 For production:
+
 ```bash
 docker-compose -f compose.yml up
 ```
@@ -77,13 +79,15 @@ The application will be available at `http://localhost:3000`
 ### Setup Steps
 
 1. **Configure the Pascal Script**: Edit `mAirlist.mls` and update the constants:
+
    ```pascal
    const
      URL = 'your endpoint'; //eg. 'http://192.168.1.2:3000'
      APPKEY = 'yourappkey'; //eg. '1234567890abcdef'
    ```
 
-2. **Install in mAirlist**: 
+2. **Install in mAirlist**:
+
    - Copy `mAirlist.mls` to your mAirlist configuration folder
    - Go to mAirlist → Control Panel → Background Scripts
    - Add the script to the list and enable it
