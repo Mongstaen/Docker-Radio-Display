@@ -5,6 +5,7 @@ This Node.js web application provides a real-time radio studio monitor for mAirl
 ## Features
 
 - **Real-time display**: Shows current song (artist/title) playing in mAirlist
+- **Song history and upcoming tracks**: Displays previous and next songs when provided
 - **Studio status indicators**: 
   - Microphone state (on/off)
   - Automation mode (Auto/Assist)
@@ -100,6 +101,59 @@ The application will be available at `http://localhost:3000`
 - `GET /lastUpdate` - Get current status data (JSON)
 - `POST /` - Update status (requires APPKEY authentication)
 - `GET /swagger` - API documentation (requires basic auth)
+
+### API Data Structure
+
+When sending updates to `POST /`, the following fields are supported:
+
+**Required:**
+- `appkey` (string) - API authentication key
+
+**Current Song (required for song updates):**
+- `artist` (string) - Current song artist
+- `title` (string) - Current song title
+- `duration` (string) - Song duration in HH:MM:SS format (optional)
+
+**Song History (optional - new in v0.1.0):**
+- `previousArtist` (string) - Previous song artist
+- `previousTitle` (string) - Previous song title
+- `nextArtist` (string) - Next song artist
+- `nextTitle` (string) - Next song title
+
+**Studio Status (optional):**
+- `microphone` (boolean) - Microphone state (true = ON, false = OFF)
+- `automation` (boolean) - Automation mode (true = Auto, false = Assist)
+- `eof` (boolean) - End of file trigger for countdown
+
+**Example API calls:**
+
+Basic current song update:
+```json
+{
+  "appkey": "yourappkey",
+  "artist": "Artist Name",
+  "title": "Song Title",
+  "duration": "00:03:45",
+  "microphone": false,
+  "automation": true
+}
+```
+
+Enhanced update with song history:
+```json
+{
+  "appkey": "yourappkey",
+  "artist": "Current Artist",
+  "title": "Current Song",
+  "duration": "00:03:45",
+  "previousArtist": "Previous Artist",
+  "previousTitle": "Previous Song",
+  "nextArtist": "Next Artist",
+  "nextTitle": "Next Song",
+  "microphone": false,
+  "automation": true
+}
+```
 
 ## Development
 

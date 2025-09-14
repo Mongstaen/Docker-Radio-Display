@@ -59,6 +59,11 @@ const swaggerBasicAuth = (req, res, next) => {
   return res.status(401).send("Invalid credentials");
 };
 
+app.get("/swagger.json", swaggerBasicAuth, (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerSpec);
+});
+
 app.use(
   "/swagger",
   swaggerBasicAuth,
@@ -124,6 +129,22 @@ app.get("/lastUpdate", (req, res) => {
  *               eof:
  *                 type: boolean
  *                 description: End of file status (TBR)
+ *               previousArtist:
+ *                 type: string
+ *                 description: Previous song artist name
+ *                 example: 'Previous Artist'
+ *               previousTitle:
+ *                 type: string
+ *                 description: Previous song title
+ *                 example: 'Previous Song Title'
+ *               nextArtist:
+ *                 type: string
+ *                 description: Next song artist name
+ *                 example: 'Next Artist'
+ *               nextTitle:
+ *                 type: string
+ *                 description: Next song title
+ *                 example: 'Next Song Title'
  *     responses:
  *       200:
  *         description: Data successfully sent to clients
@@ -150,7 +171,7 @@ app.post("/", (req, res) => {
     return res.status(400).json({ error: "Invalid or missing appkey" });
   }
 
-  const allowedKeys = ["artist", "title", "microphone", "automation", "eof"];
+  const allowedKeys = ["artist", "title", "microphone", "automation", "eof", "previousArtist", "previousTitle", "nextArtist", "nextTitle"];
   const filtered = {};
 
   for (const key of allowedKeys) {
@@ -173,6 +194,10 @@ app.post("/", (req, res) => {
   if (req.body.artist) socket.emit("artist", req.body.artist);
   if (req.body.title) socket.emit("title", req.body.title);
   if (req.body.duration) socket.emit("duration", req.body.duration);
+  if (req.body.previousArtist) socket.emit("previousArtist", req.body.previousArtist);
+  if (req.body.previousTitle) socket.emit("previousTitle", req.body.previousTitle);
+  if (req.body.nextArtist) socket.emit("nextArtist", req.body.nextArtist);
+  if (req.body.nextTitle) socket.emit("nextTitle", req.body.nextTitle);
 
   if ("microphone" in req.body) {
     const mic = req.body.microphone;
