@@ -19,6 +19,15 @@
         <h1 id="titleText"></h1>
         <h2 id="durationText" style="display: none;"></h2>
       </div>
+      
+      <div class="song-history">
+        <div class="previoussong">
+          <h3>Previous:</h3>
+          <h4 id="previousArtistText"></h4>
+          <h4 id="previousTitleText"></h4>
+        </div>
+        
+      </div>
     </div>
 
     <div class="container">
@@ -130,6 +139,8 @@
     artistText = document.getElementById("artistText");
     titleText = document.getElementById("titleText");
     durationText = document.getElementById("durationText");
+    previousArtistText = document.getElementById("previousArtistText");
+    previousTitleText = document.getElementById("previousTitleText");
     microphoneDiv = document.getElementById("microphoneDiv");
     microphoneText = document.getElementById("microphoneText");
     automationDiv = document.getElementById("automationDiv");
@@ -198,6 +209,8 @@
           if (data.artist) artistText.innerText = data.artist;
           if (data.title) titleText.innerText = data.title;
           if (data.duration) startDurationCountdown(data.duration);
+          if (data.previousArtist) previousArtistText.innerText = data.previousArtist;
+          if (data.previousTitle) previousTitleText.innerText = data.previousTitle;
 
           if (data.microphone === "true") {
             microphoneText.innerText = "MIC ON";
@@ -235,6 +248,15 @@
     socket.on("duration", function (duration) {
       startDurationCountdown(duration);
     });
+
+    socket.on("previousArtist", function (previousArtist) {
+      previousArtistText.innerText = previousArtist;
+    });
+
+    socket.on("previousTitle", function (previousTitle) {
+      previousTitleText.innerText = previousTitle;
+    });
+
 
     socket.on("microphone", function (microphone) {
       if (microphone) {

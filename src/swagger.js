@@ -10,7 +10,7 @@ const options = {
       description: 'Documentation for the Radio Display API',
     },
   },
-  apis: ['./routes/*.js', './index.js'], // Point to your route files
+  apis: [__dirname + '/index.js'], // Point to your route files
 };
 
 const swaggerSpec = swaggerJSDoc(options);

@@ -5,6 +5,7 @@ This Node.js web application provides a real-time radio studio monitor for mAirl
 ## Features
 
 - **Real-time display**: Shows current song (artist/title) playing in mAirlist
+- **Automatic song history**: Displays previous song automatically as new songs are received
 - **Studio status indicators**: 
   - Microphone state (on/off)
   - Automation mode (Auto/Assist)
@@ -100,6 +101,44 @@ The application will be available at `http://localhost:3000`
 - `GET /lastUpdate` - Get current status data (JSON)
 - `POST /` - Update status (requires APPKEY authentication)
 - `GET /swagger` - API documentation (requires basic auth)
+
+### API Data Structure
+
+When sending updates to `POST /`, the following fields are supported:
+
+**Required:**
+- `appkey` (string) - API authentication key
+
+**Current Song (required for song updates):**
+- `artist` (string) - Current song artist
+- `title` (string) - Current song title
+- `duration` (string) - Song duration in HH:MM:SS format (optional)
+
+
+**Studio Status (optional):**
+- `microphone` (boolean) - Microphone state (true = ON, false = OFF)
+- `automation` (boolean) - Automation mode (true = Auto, false = Assist)
+- `eof` (boolean) - End of file trigger for countdown
+
+**Song History:**
+The server automatically maintains a history of the last 3 songs. When you send a new song, it:
+- Adds the new song to the history
+- Automatically displays the previous song below the current song
+- No need to track or send historical data - it's handled server-side!
+
+**Example API call:**
+```json
+{
+  "appkey": "yourappkey",
+  "artist": "Current Artist",
+  "title": "Current Song",
+  "duration": "00:03:45",
+  "microphone": false,
+  "automation": true
+}
+```
+
+The server will automatically show this as the current song and move the previously current song to the "Previous" display.
 
 ## Development
 

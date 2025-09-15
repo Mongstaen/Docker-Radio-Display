@@ -13,9 +13,69 @@ const DATA_FILE = path.join(__dirname, "lastUpdate.json");
 function loadCurrentData() {
   if (fs.existsSync(DATA_FILE)) {
     const data = fs.readFileSync(DATA_FILE, "utf8");
-    return JSON.parse(data);
+    const parsedData = JSON.parse(data);
+    
+    // Migrate old format to new song history format
+    if (!parsedData.songHistory && (parsedData.artist || parsedData.title)) {
+      parsedData.songHistory = [];
+      if (parsedData.artist && parsedData.title) {
+        parsedData.songHistory.push({
+          artist: parsedData.artist,
+          title: parsedData.title,
+          timestamp: new Date().toISOString()
+        });
+      }
+      // Remove old fields after migration
+      delete parsedData.artist;
+      delete parsedData.title;
+    }
+    
+    // Ensure songHistory exists
+    if (!parsedData.songHistory) {
+      parsedData.songHistory = [];
+    }
+    
+    return parsedData;
   }
-  return {};
+  return { songHistory: [] };
+}
+
+// Song history management functions
+function addSongToHistory(artist, title) {
+  const currentData = loadCurrentData();
+  const newSong = {
+    artist: artist,
+    title: title,
+    timestamp: new Date().toISOString()
+  };
+  
+  // Check if this is the same as the current song (avoid duplicates)
+  const lastSong = getCurrentSong(currentData);
+  if (lastSong && lastSong.artist === artist && lastSong.title === title) {
+    return currentData; // No change needed
+  }
+  
+  // Add new song to the end of the array
+  currentData.songHistory.push(newSong);
+  
+  // Keep only the last 3 songs
+  if (currentData.songHistory.length > 3) {
+    currentData.songHistory = currentData.songHistory.slice(-3);
+  }
+  
+  return currentData;
+}
+
+function getCurrentSong(data = null) {
+  const currentData = data || loadCurrentData();
+  const history = currentData.songHistory || [];
+  return history.length > 0 ? history[history.length - 1] : null;
+}
+
+function getPreviousSong(data = null) {
+  const currentData = data || loadCurrentData();
+  const history = currentData.songHistory || [];
+  return history.length > 1 ? history[history.length - 2] : null;
 }
 
 // TODO: Add Swagger documentation and set up correctly
@@ -59,6 +119,11 @@ const swaggerBasicAuth = (req, res, next) => {
   return res.status(401).send("Invalid credentials");
 };
 
+app.get("/swagger.json", swaggerBasicAuth, (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerSpec);
+});
+
 app.use(
   "/swagger",
   swaggerBasicAuth,
@@ -79,7 +144,26 @@ app.get("/lastUpdate", (req, res) => {
   if (Object.keys(currentData).length === 0) {
     return res.status(404).json({ error: "No data found" });
   }
-  res.json(currentData);
+  
+  // Build response with current and previous song data for backward compatibility
+  const currentSong = getCurrentSong(currentData);
+  const previousSong = getPreviousSong(currentData);
+  
+  const response = { ...currentData };
+  
+  // Add current song fields for backward compatibility
+  if (currentSong) {
+    response.artist = currentSong.artist;
+    response.title = currentSong.title;
+  }
+  
+  // Add previous song fields
+  if (previousSong) {
+    response.previousArtist = previousSong.artist;
+    response.previousTitle = previousSong.title;
+  }
+  
+  res.json(response);
 });
 
 /**
@@ -161,8 +245,19 @@ app.post("/", (req, res) => {
       .status(400)
       .json({ error: "No valid keys provided in the request body" });
   }
-  const currentData = loadCurrentData();
+  
+  let currentData = loadCurrentData();
+  
+  // Handle song updates with history
+  if (filtered.artist && filtered.title) {
+    currentData = addSongToHistory(filtered.artist, filtered.title);
+    delete filtered.artist; // Remove from filtered since it's now in songHistory
+    delete filtered.title;
+  }
+  
+  // Update other fields (microphone, automation, eof)
   const updatedData = { ...currentData, ...filtered };
+  
   fs.writeFile(DATA_FILE, JSON.stringify(updatedData), (err) => {
     if (err) {
       console.error("Error writing to data file:", err);
@@ -170,8 +265,25 @@ app.post("/", (req, res) => {
   });
 
   // TODO: Validate the request body structure and content, Check types, etc.
-  if (req.body.artist) socket.emit("artist", req.body.artist);
-  if (req.body.title) socket.emit("title", req.body.title);
+  
+  // Emit current and previous song data from history
+  const currentSong = getCurrentSong(updatedData);
+  const previousSong = getPreviousSong(updatedData);
+  
+  if (currentSong) {
+    socket.emit("artist", currentSong.artist);
+    socket.emit("title", currentSong.title);
+  }
+  
+  if (previousSong) {
+    socket.emit("previousArtist", previousSong.artist);
+    socket.emit("previousTitle", previousSong.title);
+  } else {
+    // Clear previous song if none exists
+    socket.emit("previousArtist", "");
+    socket.emit("previousTitle", "");
+  }
+  
   if (req.body.duration) socket.emit("duration", req.body.duration);
 
   if ("microphone" in req.body) {
