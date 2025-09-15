@@ -5,7 +5,7 @@ This Node.js web application provides a real-time radio studio monitor for mAirl
 ## Features
 
 - **Real-time display**: Shows current song (artist/title) playing in mAirlist
-- **Song history and upcoming tracks**: Displays previous and next songs when provided
+- **Automatic song history**: Displays previous song automatically as new songs are received
 - **Studio status indicators**: 
   - Microphone state (on/off)
   - Automation mode (Auto/Assist)
@@ -114,46 +114,31 @@ When sending updates to `POST /`, the following fields are supported:
 - `title` (string) - Current song title
 - `duration` (string) - Song duration in HH:MM:SS format (optional)
 
-**Song History (optional - new in v0.1.0):**
-- `previousArtist` (string) - Previous song artist
-- `previousTitle` (string) - Previous song title
-- `nextArtist` (string) - Next song artist
-- `nextTitle` (string) - Next song title
 
 **Studio Status (optional):**
 - `microphone` (boolean) - Microphone state (true = ON, false = OFF)
 - `automation` (boolean) - Automation mode (true = Auto, false = Assist)
 - `eof` (boolean) - End of file trigger for countdown
 
-**Example API calls:**
+**Song History:**
+The server automatically maintains a history of the last 3 songs. When you send a new song, it:
+- Adds the new song to the history
+- Automatically displays the previous song below the current song
+- No need to track or send historical data - it's handled server-side!
 
-Basic current song update:
-```json
-{
-  "appkey": "yourappkey",
-  "artist": "Artist Name",
-  "title": "Song Title",
-  "duration": "00:03:45",
-  "microphone": false,
-  "automation": true
-}
-```
-
-Enhanced update with song history:
+**Example API call:**
 ```json
 {
   "appkey": "yourappkey",
   "artist": "Current Artist",
   "title": "Current Song",
   "duration": "00:03:45",
-  "previousArtist": "Previous Artist",
-  "previousTitle": "Previous Song",
-  "nextArtist": "Next Artist",
-  "nextTitle": "Next Song",
   "microphone": false,
   "automation": true
 }
 ```
+
+The server will automatically show this as the current song and move the previously current song to the "Previous" display.
 
 ## Development
 
