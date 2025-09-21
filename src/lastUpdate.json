@@ -1,1 +1,26 @@
-{"microphone":true,"automation":false,"previousArtist":"Previous Artist","previousTitle":"Previous Song Title","nextArtist":"Next Artist","nextTitle":"Next Song Title","eof":false,"songHistory":[{"artist":"Your Favourite Artist","title":"The Best Song Ever","timestamp":"2025-09-15T04:57:26.618Z"},{"artist":"First Song Artist","title":"First Song Title","timestamp":"2025-09-15T04:57:26.618Z"},{"artist":"Second Song Artist","title":"Second Song Title","timestamp":"2025-09-15T04:57:37.808Z"}]}
+{
+    "microphone": true,
+    "automation": false,
+    "previousArtist": "",
+    "previousTitle": "",
+    "nextArtist": "",
+    "nextTitle": "",
+    "eof": false,
+    "songHistory": [
+        {
+            "artist": "",
+            "title": "",
+            "timestamp": ""
+        },
+        {
+            "artist": "",
+            "title": "",
+            "timestamp": ""
+        },
+        {
+            "artist": "",
+            "title": "",
+            "timestamp": ""
+        }
+    ]
+}

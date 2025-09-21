@@ -14,7 +14,7 @@ function loadCurrentData() {
   if (fs.existsSync(DATA_FILE)) {
     const data = fs.readFileSync(DATA_FILE, "utf8");
     const parsedData = JSON.parse(data);
-    
+
     // Migrate old format to new song history format
     if (!parsedData.songHistory && (parsedData.artist || parsedData.title)) {
       parsedData.songHistory = [];
@@ -22,19 +22,19 @@ function loadCurrentData() {
         parsedData.songHistory.push({
           artist: parsedData.artist,
           title: parsedData.title,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       }
       // Remove old fields after migration
       delete parsedData.artist;
       delete parsedData.title;
     }
-    
+
     // Ensure songHistory exists
     if (!parsedData.songHistory) {
       parsedData.songHistory = [];
     }
-    
+
     return parsedData;
   }
   return { songHistory: [] };
@@ -46,23 +46,23 @@ function addSongToHistory(artist, title) {
   const newSong = {
     artist: artist,
     title: title,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
-  
+
   // Check if this is the same as the current song (avoid duplicates)
   const lastSong = getCurrentSong(currentData);
   if (lastSong && lastSong.artist === artist && lastSong.title === title) {
     return currentData; // No change needed
   }
-  
+
   // Add new song to the end of the array
   currentData.songHistory.push(newSong);
-  
+
   // Keep only the last 3 songs
   if (currentData.songHistory.length > 3) {
     currentData.songHistory = currentData.songHistory.slice(-3);
   }
-  
+
   return currentData;
 }
 
@@ -131,6 +131,20 @@ app.use(
   swaggerUi.setup(swaggerSpec)
 );
 
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: Display the radio studio monitor interface
+ *     description: Returns the main HTML interface for the radio display
+ *     responses:
+ *       200:
+ *         description: HTML interface successfully rendered
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ */
 app.get("/", (req, res) => {
   const displayMicrophone = process.env.DISPLAY_MICROPHONE !== "false";
   const displayAutomation = process.env.DISPLAY_AUTOMATION !== "false";
@@ -139,31 +153,161 @@ app.get("/", (req, res) => {
   res.render("index", { displayMicrophone, displayAutomation, displayEOF });
 });
 
+/**
+ * @swagger
+ * /lastUpdate:
+ *   get:
+ *     summary: Get current status data
+ *     description: Returns the current song information, microphone status, automation status, and other radio display data
+ *     responses:
+ *       200:
+ *         description: Current status data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 songHistory:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       artist:
+ *                         type: string
+ *                         example: "Your Favourite Artist"
+ *                       title:
+ *                         type: string
+ *                         example: "The Best Song Ever"
+ *                       timestamp:
+ *                         type: string
+ *                         format: date-time
+ *                 artist:
+ *                   type: string
+ *                   description: Current artist (for backward compatibility)
+ *                   example: "Your Favourite Artist"
+ *                 title:
+ *                   type: string
+ *                   description: Current title (for backward compatibility)
+ *                   example: "The Best Song Ever"
+ *                 previousArtist:
+ *                   type: string
+ *                   description: Previous song artist
+ *                   example: "Previous Artist"
+ *                 previousTitle:
+ *                   type: string
+ *                   description: Previous song title
+ *                   example: "Previous Song"
+ *                 microphone:
+ *                   type: boolean
+ *                   description: Microphone status
+ *                 automation:
+ *                   type: boolean
+ *                   description: Automation status
+ *                 eof:
+ *                   type: boolean
+ *                   description: End of file status
+ *       404:
+ *         description: No data found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "No data found"
+ */
 app.get("/lastUpdate", (req, res) => {
   const currentData = loadCurrentData();
   if (Object.keys(currentData).length === 0) {
     return res.status(404).json({ error: "No data found" });
   }
-  
+
   // Build response with current and previous song data for backward compatibility
   const currentSong = getCurrentSong(currentData);
   const previousSong = getPreviousSong(currentData);
-  
+
   const response = { ...currentData };
-  
+
   // Add current song fields for backward compatibility
   if (currentSong) {
     response.artist = currentSong.artist;
     response.title = currentSong.title;
   }
-  
+
   // Add previous song fields
   if (previousSong) {
     response.previousArtist = previousSong.artist;
     response.previousTitle = previousSong.title;
   }
-  
+
   res.json(response);
+});
+
+/**
+ * @swagger
+ * /current/artist:
+ *   get:
+ *     summary: Get current artist name
+ *     description: Returns only the current artist name as plain text
+ *     responses:
+ *       200:
+ *         description: Current artist name
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "Your Favourite Artist"
+ *       404:
+ *         description: No current artist found
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "No current artist found"
+ */
+app.get("/current/artist", (req, res) => {
+  const currentData = loadCurrentData();
+  const currentSong = getCurrentSong(currentData);
+
+  if (!currentSong || !currentSong.artist) {
+    return res.status(404).send("No current artist found");
+  }
+
+  res.send(currentSong.artist);
+});
+
+/**
+ * @swagger
+ * /current/title:
+ *   get:
+ *     summary: Get current song title
+ *     description: Returns only the current song title as plain text
+ *     responses:
+ *       200:
+ *         description: Current song title
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "The Best Song Ever"
+ *       404:
+ *         description: No current title found
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: "No current title found"
+ */
+app.get("/current/title", (req, res) => {
+  const currentData = loadCurrentData();
+  const currentSong = getCurrentSong(currentData);
+
+  if (!currentSong || !currentSong.title) {
+    return res.status(404).send("No current title found");
+  }
+
+  res.send(currentSong.title);
 });
 
 /**
@@ -245,19 +389,19 @@ app.post("/", (req, res) => {
       .status(400)
       .json({ error: "No valid keys provided in the request body" });
   }
-  
+
   let currentData = loadCurrentData();
-  
+
   // Handle song updates with history
   if (filtered.artist && filtered.title) {
     currentData = addSongToHistory(filtered.artist, filtered.title);
     delete filtered.artist; // Remove from filtered since it's now in songHistory
     delete filtered.title;
   }
-  
+
   // Update other fields (microphone, automation, eof)
   const updatedData = { ...currentData, ...filtered };
-  
+
   fs.writeFile(DATA_FILE, JSON.stringify(updatedData), (err) => {
     if (err) {
       console.error("Error writing to data file:", err);
@@ -265,16 +409,16 @@ app.post("/", (req, res) => {
   });
 
   // TODO: Validate the request body structure and content, Check types, etc.
-  
+
   // Emit current and previous song data from history
   const currentSong = getCurrentSong(updatedData);
   const previousSong = getPreviousSong(updatedData);
-  
+
   if (currentSong) {
     socket.emit("artist", currentSong.artist);
     socket.emit("title", currentSong.title);
   }
-  
+
   if (previousSong) {
     socket.emit("previousArtist", previousSong.artist);
     socket.emit("previousTitle", previousSong.title);
@@ -283,7 +427,7 @@ app.post("/", (req, res) => {
     socket.emit("previousArtist", "");
     socket.emit("previousTitle", "");
   }
-  
+
   if (req.body.duration) socket.emit("duration", req.body.duration);
 
   if ("microphone" in req.body) {
