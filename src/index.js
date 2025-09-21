@@ -144,26 +144,48 @@ app.get("/lastUpdate", (req, res) => {
   if (Object.keys(currentData).length === 0) {
     return res.status(404).json({ error: "No data found" });
   }
-  
+
   // Build response with current and previous song data for backward compatibility
   const currentSong = getCurrentSong(currentData);
   const previousSong = getPreviousSong(currentData);
-  
+
   const response = { ...currentData };
-  
+
   // Add current song fields for backward compatibility
   if (currentSong) {
     response.artist = currentSong.artist;
     response.title = currentSong.title;
   }
-  
+
   // Add previous song fields
   if (previousSong) {
     response.previousArtist = previousSong.artist;
     response.previousTitle = previousSong.title;
   }
-  
+
   res.json(response);
+});
+
+app.get("/current/artist", (req, res) => {
+  const currentData = loadCurrentData();
+  const currentSong = getCurrentSong(currentData);
+
+  if (!currentSong || !currentSong.artist) {
+    return res.status(404).json({ error: "No current artist found" });
+  }
+
+  res.json({ artist: currentSong.artist });
+});
+
+app.get("/current/title", (req, res) => {
+  const currentData = loadCurrentData();
+  const currentSong = getCurrentSong(currentData);
+
+  if (!currentSong || !currentSong.title) {
+    return res.status(404).json({ error: "No current title found" });
+  }
+
+  res.json({ title: currentSong.title });
 });
 
 /**
